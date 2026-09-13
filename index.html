@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日五心</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#f1ece0">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="今日五心">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;600;700;900&family=Noto+Sans+TC:wght@400;500;600;700&family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f1ece0;
+    --paper-raised:#f8f4ea;
+    --ink:#2b241c;
+    --ink-soft:#5a5142;
+    --ink-faint:#8c8371;
+    --rule:#d8cfb9;
+    --accept:#b5495a;      --accept-soft:#f3dedf;
+    --empathy:#bd7027;     --empathy-soft:#f3e3cc;
+    --awareness:#9c7a16;   --awareness-soft:#f0e5c0;
+    --mutual:#547a3e;      --mutual-soft:#e1ead7;
+    --presence:#3f6c82;    --presence-soft:#dce7ec;
+    --shadow: 0 1px 2px rgba(43,36,28,.06), 0 12px 28px -12px rgba(43,36,28,.28);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1b170f;
+      --paper-raised:#252016;
+      --ink:#efe6d4;
+      --ink-soft:#c9bea9;
+      --ink-faint:#8f8471;
+      --rule:#3c3626;
+      --accept:#e2909c;      --accept-soft:#3a2226;
+      --empathy:#e0a75f;     --empathy-soft:#3a2c17;
+      --awareness:#d0b256;   --awareness-soft:#38300f;
+      --mutual:#94b781;      --mutual-soft:#24301c;
+      --presence:#8db9cc;    --presence-soft:#1c2c33;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 32px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1b170f;
+    --paper-raised:#252016;
+    --ink:#efe6d4;
+    --ink-soft:#c9bea9;
+    --ink-faint:#8f8471;
+    --rule:#3c3626;
+    --accept:#e2909c;      --accept-soft:#3a2226;
+    --empathy:#e0a75f;     --empathy-soft:#3a2c17;
+    --awareness:#d0b256;   --awareness-soft:#38300f;
+    --mutual:#94b781;      --mutual-soft:#24301c;
+    --presence:#8db9cc;    --presence-soft:#1c2c33;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 16px 32px -14px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 60% 40% at 15% 0%, color-mix(in srgb, var(--presence) 7%, transparent), transparent 60%),
+      radial-gradient(ellipse 50% 35% at 100% 10%, color-mix(in srgb, var(--accept) 6%, transparent), transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Noto Sans TC', 'PingFang TC','Microsoft JhengHei',system-ui,sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background: color-mix(in srgb, var(--presence) 30%, transparent); }
+
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding: clamp(24px,5vw,56px) 20px 64px;
+  }
+
+  /* ---------- Header ---------- */
+  header{ text-align:center; margin-bottom: clamp(24px,4vw,36px); }
+  .eyebrow{
+    font-size:12.5px; letter-spacing:.16em; color:var(--ink-faint);
+    text-transform:uppercase; font-weight:600; margin:0 0 10px;
+  }
+  h1{
+    font-family:'Noto Serif TC',serif; font-weight:900;
+    font-size:clamp(30px,6vw,42px); margin:0 0 10px; letter-spacing:.02em;
+    text-wrap:balance;
+  }
+  .sub{
+    color:var(--ink-soft); font-size:15px; line-height:1.7; margin:0 auto;
+    max-width:46ch; text-wrap:balance;
+  }
+  .streak-row{
+    display:flex; justify-content:center; align-items:center; gap:8px;
+    margin-top:16px;
+  }
+  .streak-badge{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--paper-raised); border:1px solid var(--rule);
+    border-radius:999px; padding:7px 16px;
+    font-size:13px; font-weight:600; color:var(--ink-soft);
+  }
+  .streak-badge .flame{ font-size:14px; }
+  .streak-banner{
+    max-width:480px; margin:14px auto 0; padding:12px 34px 12px 18px;
+    background:var(--paper-raised); border:1px solid var(--rule); border-radius:14px;
+    font-size:13.5px; line-height:1.7; color:var(--ink-soft); text-align:center;
+    position:relative;
+  }
+  .streak-banner button{
+    position:absolute; top:6px; right:10px; border:none; background:none;
+    color:var(--ink-faint); font-size:16px; cursor:pointer; line-height:1; padding:4px;
+  }
+  .streak-banner[hidden]{ display:none; }
+
+  /* ---------- Mode + filter controls ---------- */
+  .controls{
+    display:flex; flex-direction:column; gap:14px; align-items:center;
+    margin: 28px 0 8px;
+  }
+  .segmented{
+    display:inline-flex; background:var(--paper-raised); border:1px solid var(--rule);
+    border-radius:999px; padding:4px; gap:2px; box-shadow: inset 0 1px 2px rgba(0,0,0,.04);
+  }
+  .segmented button{
+    border:none; background:transparent; font-family:inherit; font-size:14px; font-weight:600;
+    padding:9px 18px; border-radius:999px; cursor:pointer; color:var(--ink-soft);
+    transition: background .2s ease, color .2s ease;
+  }
+  .segmented button[aria-pressed="true"]{ background:var(--ink); color:var(--paper); }
+  .segmented button:hover:not([aria-pressed="true"]){ color:var(--ink); }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    border:1px solid var(--rule); background:var(--paper-raised);
+    color:var(--ink-soft); font-family:inherit; font-size:13px; font-weight:600;
+    padding:7px 14px 7px 10px; border-radius:999px; cursor:pointer;
+    transition:.18s ease;
+  }
+  .chip .dot{ width:9px; height:9px; border-radius:50%; background:var(--c); flex:none; }
+  .chip[aria-pressed="true"]{ border-color:var(--c); color:var(--ink); background:color-mix(in srgb, var(--c) 16%, var(--paper-raised)); }
+  .chip:hover{ border-color:var(--c); }
+
+  .guide-btn{
+    border:none; background:none; font-family:inherit; font-size:13px; color:var(--ink-faint);
+    text-decoration:underline; text-underline-offset:3px; cursor:pointer; margin-top:2px;
+  }
+  .guide-btn:hover{ color:var(--ink); }
+  .chips-hint{ font-size:12px; color:var(--ink-faint); margin:-6px 0 0; }
+
+  /* ---------- Stage ---------- */
+  .stage{ margin-top: clamp(28px,5vw,44px); }
+  .stage-single{ display:flex; justify-content:center; }
+  .stage-triple{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media (max-width:640px){ .stage-triple{ grid-template-columns:1fr; max-width:360px; margin:0 auto; } }
+
+  .card{
+    --c: var(--presence); --cs: var(--presence-soft);
+    position:relative; width:100%; max-width:380px;
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    animation: rise .5s cubic-bezier(.16,1,.3,1) both;
+  }
+  @keyframes rise{ from{ opacity:0; transform:translateY(14px) scale(.98);} to{opacity:1; transform:none;} }
+  @media (prefers-reduced-motion:reduce){ .card{ animation:none; } }
+
+  .card .band{
+    background: linear-gradient(160deg, var(--cs), transparent 130%);
+    padding:20px 22px 14px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .card .role{
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); font-weight:700;
+  }
+  .card .heart-tag{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'Ma Shan Zheng',cursive; font-size:20px; color:var(--c);
+  }
+  .card .heart-tag svg{ width:18px; height:18px; stroke:var(--c); }
+
+  .card .scene{ display:flex; justify-content:center; padding:8px 24px 0; }
+  .card .scene svg{ width:100%; max-width:220px; height:auto; }
+  .stage-triple .card .scene{ padding:6px 18px 0; }
+  .stage-triple .card .scene svg{ max-width:160px; }
+
+  .card .quote{
+    font-family:'Noto Serif TC',serif; font-weight:700;
+    font-size:22px; line-height:1.72; padding:6px 24px 22px;
+    color:var(--ink); text-align:center; width:100%;
+  }
+  .stage-triple .card .quote{ font-size:18px; padding:4px 18px 18px; }
+
+  .card .divider{ margin:0 22px; border:none; border-top:1px dashed var(--rule); }
+  .stage-triple .card .divider{ margin:0 18px; }
+
+  .card .plain{
+    padding:16px 22px 4px; font-size:14px; line-height:1.75; color:var(--ink-soft); text-align:center;
+  }
+  .stage-triple .card .plain{ padding:12px 18px 4px; font-size:13px; }
+
+  .card .action{
+    margin:14px 22px 22px; padding:14px 16px;
+    border:1px solid var(--rule); border-radius:12px;
+    background: color-mix(in srgb, var(--c) 6%, var(--paper));
+    font-size:13.5px; line-height:1.65; color:var(--ink);
+    display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center;
+  }
+  .stage-triple .card .action{ margin:12px 18px 18px; font-size:12.5px; }
+  .card .action b{ color:var(--c); font-weight:700; }
+
+  .card-empty{ text-align:center; }
+  .empty-inner{ padding:44px 26px 36px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .empty-inner svg{ width:40px; height:40px; stroke:var(--ink-faint); margin-bottom:2px; }
+  .empty-title{ font-family:'Noto Serif TC',serif; font-weight:700; font-size:18px; margin:0; }
+  .empty-sub{ font-size:13.5px; color:var(--ink-soft); margin:0 0 6px; max-width:26ch; text-wrap:balance; line-height:1.6; }
+  .empty-inner .btn{ margin-top:2px; }
+
+  /* ---------- Actions row ---------- */
+  .actions{ display:flex; gap:10px; justify-content:center; margin-top:26px; flex-wrap:wrap; }
+  .btn{
+    font-family:inherit; font-size:14.5px; font-weight:700; border-radius:999px; cursor:pointer;
+    padding:13px 26px; border:1px solid var(--rule); background:var(--paper-raised); color:var(--ink);
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn:hover{ transform:translateY(-1px); box-shadow:0 8px 16px -10px rgba(43,36,28,.35); }
+  .btn:active{ transform:translateY(0); }
+  .btn.primary{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  @media (prefers-reduced-motion:reduce){ .btn{ transition:none; } .btn:hover{ transform:none; } }
+
+  .today-note{
+    text-align:center; font-size:12.5px; color:var(--ink-faint); margin-top:14px;
+  }
+
+  /* ---------- History dots ---------- */
+  .history{ display:flex; justify-content:center; gap:6px; margin-top:22px; flex-wrap:wrap; }
+  .history span{ width:7px; height:7px; border-radius:50%; background:var(--rule); }
+  .history span.on{ background:var(--dc, var(--ink)); }
+
+  /* ---------- Guide panel ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(20,16,10,.45); backdrop-filter:blur(2px);
+    display:flex; align-items:flex-end; justify-content:center; padding:0;
+    opacity:0; pointer-events:none; transition:opacity .2s ease; z-index:20;
+  }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+  @media (min-width:640px){ .overlay{ align-items:center; padding:20px; } }
+  .panel{
+    background:var(--paper-raised); width:100%; max-width:560px; max-height:82vh; overflow-y:auto;
+    border-radius:22px 22px 0 0; padding:26px 24px 32px; box-shadow:var(--shadow);
+    transform:translateY(16px); transition:transform .25s cubic-bezier(.16,1,.3,1);
+  }
+  @media (min-width:640px){ .panel{ border-radius:22px; transform:translateY(8px); } }
+  .overlay.open .panel{ transform:none; }
+  .panel h2{ font-family:'Noto Serif TC',serif; font-size:20px; margin:0 0 4px; }
+  .panel .lead{ color:var(--ink-soft); font-size:13.5px; margin:0 0 18px; line-height:1.7; }
+  .heart-row{
+    display:flex; gap:12px; padding:14px 0; border-top:1px solid var(--rule);
+  }
+  .heart-row:first-of-type{ border-top:none; }
+  .heart-row .icon{
+    flex:none; width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    background:var(--hs); color:var(--h);
+  }
+  .heart-row .icon svg{ width:18px; height:18px; stroke:var(--h); }
+  .heart-row .name{ font-family:'Noto Serif TC',serif; font-weight:700; font-size:15px; color:var(--h); margin:0 0 3px; }
+  .heart-row p{ margin:0; font-size:13px; line-height:1.7; color:var(--ink-soft); }
+  .panel-close{
+    display:block; margin:18px auto 0; background:none; border:none; color:var(--ink-faint);
+    font-family:inherit; font-size:13px; text-decoration:underline; cursor:pointer;
+  }
+
+  /* ---------- Pocket wisdom ---------- */
+  .pocket-item{
+    border:1px solid var(--rule); border-radius:16px; padding:20px 20px 22px;
+    background: linear-gradient(160deg, var(--cs), transparent 140%);
+  }
+  .pocket-tag{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:'Ma Shan Zheng',cursive; font-size:19px; color:var(--c); margin:0 0 10px;
+  }
+  .pocket-tag svg{ width:17px; height:17px; stroke:var(--c); }
+  .pocket-item .scene{ display:flex; justify-content:center; margin:2px 0 12px; }
+  .pocket-item .scene svg{ width:100%; max-width:180px; height:auto; }
+  .pocket-text{
+    font-family:'Noto Serif TC',serif; font-weight:600; font-size:17px; line-height:1.8;
+    margin:0; color:var(--ink); text-wrap:balance;
+  }
+
+  .fab{
+    position:fixed; right:18px; bottom:18px; z-index:15;
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--ink); color:var(--paper); border:none; border-radius:999px;
+    padding:13px 20px 13px 15px; font-family:inherit; font-weight:700; font-size:14px;
+    cursor:pointer; box-shadow:var(--shadow);
+    transition: transform .15s ease;
+  }
+  .fab svg{ width:19px; height:19px; stroke:var(--paper); flex:none; }
+  .fab:hover{ transform:translateY(-1px); }
+  @media (prefers-reduced-motion:reduce){ .fab{ transition:none; } .fab:hover{ transform:none; } }
+  @media (max-width:480px){ .fab span{ display:none; } .fab{ padding:13px; } }
+
+  footer{ text-align:center; margin-top:56px; font-size:12px; color:var(--ink-faint); line-height:1.8; }
+  footer a{ color:inherit; }
+  .copyright{
+    margin:0 auto; max-width:52ch; text-align:left;
+    background:var(--paper-raised);
+    border:1px solid var(--rule);
+    border-radius:14px;
+    padding:16px 20px 18px;
+  }
+  .copyright-title{
+    font-family:'Noto Serif TC',serif; font-weight:700; font-size:13px;
+    color:var(--ink-soft); letter-spacing:.06em; margin:0 0 8px; text-align:center;
+  }
+  .copyright-body{
+    margin:0; font-size:11px; line-height:1.8; color:var(--ink-faint);
+  }
+  .copyright-line{
+    margin:10px 0 0; text-align:center; font-size:11px; line-height:1.8; color:var(--ink-faint);
+  }
+  .copyright a{ color:var(--ink-soft); text-decoration:underline; text-underline-offset:2px; }
+  .copyright a:hover{ color:var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Five Hearts · 每日練習</p>
+    <h1>今日五心</h1>
+    <p class="sub">每天一張，練習接納、共情、醒覺、共好、同在——不求做到完美，只是願意帶著它，生活一天。</p>
+    <div class="streak-row" id="streakRow"></div>
+  </header>
+
+  <div class="streak-banner" id="streakBanner" hidden></div>
+
+  <div class="controls">
+    <div class="segmented" role="group" aria-label="抽卡模式">
+      <button type="button" id="modeDaily" aria-pressed="true">每日一卡</button>
+      <button type="button" id="modeTriple" aria-pressed="false">過去・現在・未來</button>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="只看某一心"></div>
+    <p class="chips-hint">篩選會套用在下一次抽卡，不會影響今天已經抽出的卡</p>
+    <button type="button" class="guide-btn" id="openGuide">五心是什麼？看一下說明</button>
+  </div>
+
+  <div class="stage" id="stage"></div>
+
+  <div class="actions" id="actionsRow"></div>
+  <p class="today-note" id="todayNote"></p>
+  <div class="history" id="history" aria-hidden="true"></div>
+
+  <footer>
+    <div class="copyright">
+      <p class="copyright-title">版權聲明</p>
+      <p class="copyright-body">
+        「今日五心」源自<a href="http://www.sohe.org.tw/" target="_blank" rel="noopener">社團法人心教育發展協會</a>推廣的「共情的力量－五心對話工作坊」，並延伸發展為「五心實踐行動小卡」。相關理念、架構及內容之版權均屬協會所有。<br>
+        歡迎分享本平台原始連結，未經授權不得重製、改作或作為商業用途。如有課程、研習、出版或合作推廣需求，歡迎接洽。
+      </p>
+      <p class="copyright-line">© 2026 社團法人心教育發展協會</p>
+    </div>
+  </footer>
+</div>
+
+<div class="overlay" id="guideOverlay">
+  <div class="panel">
+    <h2>五心法則是什麼？</h2>
+    <p class="lead">五個練習的方向，不用一次做到，一天練一心就很好。</p>
+    <div id="guideList"></div>
+    <button type="button" class="panel-close" id="closeGuide">關閉</button>
+  </div>
+</div>
+
+<button type="button" class="fab" id="openPocket" aria-label="猶豫時，打開錦囊">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3.5h6l1.3 4H7.7L9 3.5Z"/><path d="M7.3 7.5h9.4l-1.1 9.3a3 3 0 0 1-3 2.7h-1.2a3 3 0 0 1-3-2.7L7.3 7.5Z"/><path d="M9.3 7.5c0 1.9 1.2 3 2.7 3s2.7-1.1 2.7-3"/></svg>
+  <span>猶豫錦囊</span>
+</button>
+
+<div class="overlay" id="pocketOverlay">
+  <div class="panel">
+    <h2>猶豫錦囊</h2>
+    <p class="lead">拿不定主意的時候，抽一句給自己一個提醒。</p>
+    <div id="pocketCard"></div>
+    <div class="actions" style="margin-top:18px;">
+      <button type="button" class="btn" id="pocketAgain">再抽一個</button>
+      <button type="button" class="btn primary" id="closePocket">關閉</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var ICONS = {
+    accept: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.2c-.3 0-.6-.1-.8-.3-3-2.4-7.6-6.3-7.6-10.4C3.6 6.6 5.7 4.5 8.4 4.5c1.5 0 2.9.7 3.6 1.9.7-1.2 2.1-1.9 3.6-1.9 2.7 0 4.8 2.1 4.8 4.9 0 4.2-4.6 8-7.6 10.4-.2.2-.5.3-.8.3Z"/></svg>',
+    empathy: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.2" cy="12" r="6"/><circle cx="14.8" cy="12" r="6"/></svg>',
+    awareness: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.4"/><path d="M12 3v3.2M12 17.8V21M21 12h-3.2M6.2 12H3M18.4 5.6l-2.3 2.3M7.9 16.1l-2.3 2.3M18.4 18.4l-2.3-2.3M7.9 7.9 5.6 5.6"/></svg>',
+    mutual: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c0-6.5 2.6-10.3 7.6-11.8C18.3 14 15.4 17 12 17"/><path d="M12 21c0-7-2.8-11-7.6-12.4C5.6 13.6 8.6 17 12 17v4Z"/></svg>',
+    presence: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="12" r="2.3"/><circle cx="18" cy="12" r="2.3"/><path d="M8.3 12h7.4"/></svg>',
+    blank: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="17" rx="3" stroke-dasharray="2.6 3.4"/></svg>'
+  };
+
+  // ---------- decorative scenes：呼應小卡意境的水墨風景 ----------
+  var SCENES = {
+    accept: '<svg viewBox="0 0 240 90" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--c)">' +
+      '<path d="M14 82c26-6 46-18 62-34s36-28 60-34 62-8 92-2"/>' +
+      '<path d="M96 40c6-8 14-12 24-12" stroke-width="1.1"/>' +
+      '<path d="M150 22c5-7 12-10 20-9" stroke-width="1.1"/>' +
+      '<g style="fill:var(--cs)" stroke-width="1">' +
+        '<g transform="translate(70,52) scale(.9)"><circle cx="0" cy="-5" r="3.6"/><circle cx="4.7" cy="-1.5" r="3.6"/><circle cx="3" cy="4" r="3.6"/><circle cx="-3" cy="4" r="3.6"/><circle cx="-4.7" cy="-1.5" r="3.6"/><circle cx="0" cy="0" r="1.8" style="fill:var(--c);stroke:none"/></g>' +
+        '<g transform="translate(122,26) scale(.75)"><circle cx="0" cy="-5" r="3.6"/><circle cx="4.7" cy="-1.5" r="3.6"/><circle cx="3" cy="4" r="3.6"/><circle cx="-3" cy="4" r="3.6"/><circle cx="-4.7" cy="-1.5" r="3.6"/><circle cx="0" cy="0" r="1.8" style="fill:var(--c);stroke:none"/></g>' +
+        '<g transform="translate(180,15)"><circle cx="0" cy="-5" r="3.6"/><circle cx="4.7" cy="-1.5" r="3.6"/><circle cx="3" cy="4" r="3.6"/><circle cx="-3" cy="4" r="3.6"/><circle cx="-4.7" cy="-1.5" r="3.6"/><circle cx="0" cy="0" r="1.8" style="fill:var(--c);stroke:none"/></g>' +
+      '</g>' +
+      '<circle cx="98" cy="47" r="2" style="fill:var(--c);stroke:none"/><circle cx="205" cy="12" r="2" style="fill:var(--c);stroke:none"/>' +
+    '</svg>',
+    empathy: '<svg viewBox="0 0 240 90" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--c)">' +
+      '<path d="M92 28q7-10 14 0q7-10 14 0"/>' +
+      '<path d="M130 20q6-8 12 0q6-8 12 0"/>' +
+      '<path d="M18 64c16-5 28-5 42 0s28 5 42 0 28-5 42 0 28 5 42 0 28-5 40-1" stroke-width="1.2"/>' +
+      '<path d="M12 76c18-5 32-5 48 0s32 5 48 0 32-5 48 0 32 5 46 1" stroke-width="1.1" opacity=".55"/>' +
+    '</svg>',
+    awareness: '<svg viewBox="0 0 240 90" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--c)">' +
+      '<circle cx="120" cy="38" r="16" style="fill:var(--cs)"/>' +
+      '<path d="M120 12v-8M120 72v-6M148 38h8M84 38h8M138.4 19.6l5.6-5.6M96 62l5.6-5.6M138.4 56.4l5.6 5.6M96 14l5.6 5.6" stroke-width="1.2"/>' +
+      '<path d="M10 80c20-14 34-20 48-20s26 8 40 8 24-14 42-14 30 10 46 10 26-8 40-8 20 4 34 0" stroke-width="1.6"/>' +
+    '</svg>',
+    mutual: '<svg viewBox="0 0 240 90" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--c)">' +
+      '<path d="M80 82V46M80 46c-14 2-22-6-22-16M80 46c10 2 18-4 20-14M80 34c-10 0-16-8-14-18M80 34c8 0 14-6 15-15"/>' +
+      '<path d="M164 82V40M164 40c-16 3-25-6-25-18M164 40c11 2 20-5 22-16M164 26c-11 0-18-9-16-20M164 26c9 0 16-7 17-17"/>' +
+      '<path d="M6 82h228" stroke-width="1.3" opacity=".6"/>' +
+      '<path d="M118 30q6-7 12 0q6-7 12 0" stroke-width="1.3"/>' +
+    '</svg>',
+    presence: '<svg viewBox="0 0 240 90" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--c)">' +
+      '<path d="M10 46c18-16 34-24 50-24s28 12 46 12 26-16 44-16 30 14 44 14 26-10 36-6" stroke-width="1.6"/>' +
+      '<circle cx="190" cy="14" r="9" style="fill:var(--cs)"/>' +
+      '<path d="M6 50h228" stroke-width="1.2" opacity=".7"/>' +
+      '<path d="M10 58c18 12 34 18 50 18s28-9 46-9 26 12 44 12 30-10 44-10 26 7 36 4" stroke-width="1.3" opacity=".45"/>' +
+      '<path d="M20 74c40-3 60 3 90 0s60-4 90 0" stroke-width="1" opacity=".3"/>' +
+    '</svg>'
+  };
+
+  var HEARTS = {
+    accept:    { name:'接納之心', order:1, tagline:'練習接住此刻不完美的自己，不急著否定或改造它。' },
+    empathy:   { name:'共情之心', order:2, tagline:'練習理解別人、也理解自己，情緒背後真正在意的是什麼。' },
+    awareness: { name:'醒覺之心', order:3, tagline:'練習看清自己的慣性反應，讓選擇多一分清醒。' },
+    mutual:    { name:'共好之心', order:4, tagline:'練習相信關係不是輸贏，而是彼此可以一起變好。' },
+    presence:  { name:'同在之心', order:5, tagline:'練習真正地在場陪伴，不急著講道理，只是好好在。' }
+  };
+  var HEART_KEYS = ['accept','empathy','awareness','mutual','presence'];
+
+  var CARDS = [
+    {id:1,heart:'presence',quote:'今天，我與自己、與他人、與世界同在。',plain:'不用心思飄到別處，好好地「在這裡」——跟自己在一起，也跟眼前的人事物在一起。',action:'今天吃一餐飯時，放下手機，專心感受吃飯這件事。'},
+    {id:2,heart:'mutual',quote:'今天，我為他人撐傘，也接受他人為我遮風。',plain:'願意幫助別人，也願意讓別人幫助你，互相照顧才是長久的關係。',action:'今天主動幫一個人一個小忙，也試著接受一次別人的幫忙。'},
+    {id:3,heart:'awareness',quote:'今天，我在覺醒中前行。',plain:'不是渾渾噩噩過一天，而是清楚知道自己在做什麼、為什麼做。',action:'開始一件事之前，先問自己一句「我為什麼要做這件事」。'},
+    {id:4,heart:'empathy',quote:'今天，我們不一樣，但我們又一樣。',plain:'每個人的成長背景不同，但渴望被理解、被善待的心情是一樣的。',action:'遇到跟你想法不同的人，先想一句：「他也是想把事情做好」。'},
+    {id:5,heart:'accept',quote:'今天，我站在接納裡開始一天。',plain:'今天不管心情好壞，先跟自己說一聲「早安，這樣的我也可以」，不用假裝很有精神才能出門。',action:'出門前深呼吸一口氣，對自己說一句「今天這樣的我，可以」。'},
+    {id:6,heart:'presence',quote:'今天，我在簡單生活中感受完整。',plain:'不用等到達成什麼大目標才覺得滿足，一杯茶、一段安靜的時間，也可以是完整的。',action:'今天找一個平凡的小片刻（喝水、走路），專心感受它。'},
+    {id:7,heart:'mutual',quote:'今天，讓我去溫暖這個世界。',plain:'不用做大事，一個微笑、一句關心，都能讓身邊的人感覺好一點。',action:'今天給一個人一句真心的稱讚或問候。'},
+    {id:8,heart:'awareness',quote:'今天，我選擇有意識地生活。',plain:'少一點自動導航式的反應，多一點「我正在選擇」的清醒感。',action:'今天做一個小決定前，先停頓3秒再行動，不憑反射反應。'},
+    {id:9,heart:'empathy',quote:'今天，我讓共情成為我的力量。',plain:'願意理解別人，不是軟弱，而是讓你更有能力化解衝突的力量。',action:'今天面對一個讓你不耐煩的人，先問自己「他現在可能在經歷什麼」。'},
+    {id:10,heart:'accept',quote:'今天，我承認需要休息。',plain:'累了就是累了，不是懶惰，也不用等到倒下才准許自己喘口氣。',action:'今天找一個5分鐘，什麼都不做，純粹坐著或躺著。'},
+    {id:11,heart:'presence',quote:'今天，我感受Power in me。',plain:'「Power in me」意思是「我心裡本來就有力量」——不用等別人給你信心，你自己就有。',action:'今天遇到困難時，對自己說一句：「我本來就有力量面對這個」。'},
+    {id:12,heart:'mutual',quote:'今天，我用善念去成就他人與世界。',plain:'做決定時多想一下：這樣做，對別人、對整體是不是也好？',action:'今天做一件事之前，順便想想這對其他人有沒有幫助。'},
+    {id:13,heart:'awareness',quote:'今天，我用當下的清醒意識守護能量。',plain:'察覺什麼事情在消耗你的精力，就有機會提早喊停，不被榨乾。',action:'今天留意一件讓你特別累的事，決定明天要調整做法。'},
+    {id:14,heart:'empathy',quote:'今天，我不急著站在任何一方。',plain:'聽到兩方說法不一致時，先聽完雙方，不急著馬上下判斷選邊站。',action:'處理糾紛時，先各自聽完兩邊的說法，再開口下結論。'},
+    {id:15,heart:'accept',quote:'今天，我允許事情尚未完成。',plain:'進度沒趕上、事情還沒改完也沒關係，「還沒好」不等於「做不好」。',action:'把待辦清單上做不完的那一項，改寫成「明天繼續」，先放下它。'},
+    {id:16,heart:'presence',quote:'今天，我回到自己的身、自己的心，與身心同在。',plain:'忙起來常常人在心不在，今天練習把注意力帶回自己的身體和感受上。',action:'今天花30秒，掃描一下自己身體有沒有哪裡緊繃，然後放鬆它。'},
+    {id:17,heart:'mutual',quote:'今天，我選擇成為一個能夠溫暖他人的人。',plain:'遇到低潮的人，願意成為那個讓他覺得被支持的人。',action:'今天留意一個看起來需要支持的人，陪他說說話。'},
+    {id:18,heart:'awareness',quote:'今天，我讓清醒意識走在情緒前面。',plain:'生氣或著急的當下，先看見「我現在情緒上來了」，再決定要怎麼回應。',action:'情緒升高時，先在心裡說一句「我現在在生氣」，再開口說話。'},
+    {id:19,heart:'empathy',quote:'今天，我放慢自己去共情他人。',plain:'共情需要時間，不是聽一半就急著給建議或解決方案。',action:'今天有人跟你抱怨時，先聽完再回應，中途不打斷。'},
+    {id:20,heart:'accept',quote:'今天，我不急著證明自己。',plain:'不用每件事都做到滿分才能證明自己夠好，你的價值不是靠表現換來的。',action:'今天完成一件事後，不多做任何補充解釋，直接讓它過去。'},
+    {id:21,heart:'presence',quote:'今天，我選擇安住當下，而非拉扯內耗。',plain:'一直在心裡糾結「早知道」、「如果」，只會消耗自己，試著把心安放在現在。',action:'發現自己在反覆糾結同一件事時，跟自己說「先回到現在」。'},
+    {id:22,heart:'mutual',quote:'今天，我願意為他人留一點空間。',plain:'開會或討論時，讓別人也有機會發言、有機會做選擇，不用你一個人主導。',action:'今天開會或討論時，主動先讓別人發表意見。'},
+    {id:23,heart:'awareness',quote:'今天，我對自己的行動保持覺察。',plain:'留意自己「為什麼」做這件事，而不是做完才發現自己也不知道為什麼。',action:'今天做一件例行公事時，特別留意自己當下的心情和動機。'},
+    {id:24,heart:'empathy',quote:'今天，我以共情拉近距離。',plain:'一句「我懂那種感覺」，往往比一堆道理更能讓對方願意靠近你。',action:'今天對一個人說「我懂，那真的不容易」，不加任何但是。'},
+    {id:25,heart:'accept',quote:'今天，我讓心更鬆一點。',plain:'肩膀放下來，眉頭鬆開，不用每一分鐘都繃緊神經待命。',action:'察覺自己肩膀緊繃時，刻意吐一口長氣，放鬆肩膀3秒。'},
+    {id:26,heart:'presence',quote:'今天，我陪情緒來，也陪它走。',plain:'情緒來的時候不用趕走它，讓它自然停留一下，它也會自然離開。',action:'今天情緒出現時，給自己一分鐘單純感受它，不急著處理或轉移。'},
+    {id:27,heart:'mutual',quote:'今天，我願意把自己的安定分享給此刻不安的人。',plain:'你的穩定情緒，本身就是一種可以借給別人的力量。',action:'今天陪一個焦慮的人時，保持自己語氣平穩，不跟著慌。'},
+    {id:28,heart:'awareness',quote:'今天，我看清真正重要的事。',plain:'很多事看起來緊急，但不一定重要，先分清楚哪個才是真正該優先做的。',action:'把今天的待辦清單挑出一件最重要的，先做那一件。'},
+    {id:29,heart:'empathy',quote:'今天，我理解並允許彼此的難處。',plain:'對方沒做到，可能不是不想做，而是他也有他的難處。',action:'有人讓你失望時，先想一個他可能的難處，再決定怎麼回應。'},
+    {id:30,heart:'accept',quote:'今天，我願意放下過度要求。',plain:'對自己或對別人的標準，可以先調回「夠好就好」，不是每件事都要做到極致。',action:'挑一件你正在龜毛的小事，決定「這樣就好了」，不再修改。'},
+    {id:31,heart:'presence',quote:'今天，我用「心」創造一切。',plain:'用心去做一件事——認真、專注、帶著在乎——結果往往會不一樣。',action:'今天挑一件平常隨便做的小事，這次用心慢慢做。'},
+    {id:32,heart:'mutual',quote:'今天，我用善念成為他人的支點。',plain:'在別人搖搖欲墜的時候，成為那個可以讓他靠一下的支撐點。',action:'今天問一個可能正在硬撐的人：「需要我幫忙嗎？」'},
+    {id:33,heart:'awareness',quote:'今天，我不再自動討好。',plain:'答應別人之前，先問問自己是不是真心願意，而不是怕對方不高興才點頭。',action:'今天有人請你幫忙時，先想3秒再回答，不要立刻反射式答應。'},
+    {id:34,heart:'empathy',quote:'今天，我感受個人的痛苦並共情它。',plain:'看到別人（或自己）辛苦時，願意停下來感受一下那份不容易，而不是直接跳過。',action:'今天留意一個看起來很累的人，簡單問一句「你還好嗎」。'},
+    {id:35,heart:'accept',quote:'今天，我留給自己一點空間。',plain:'行事曆排滿滿之外，留一小段完全屬於自己、不用交代給任何人的時間。',action:'在行事曆上刻意空出10分鐘，寫上「我的時間」，誰都不能佔用。'},
+    {id:36,heart:'presence',quote:'今天，我在五心實踐中厚實自己。',plain:'「厚實自己」的意思是：每天練習一點點接納、共情、覺察，日子久了，內心會變得更穩、更有底氣。',action:'今天結束前，回想一下今天有沒有練到五心的哪一項，寫下一句心得。'},
+    {id:37,heart:'mutual',quote:'今天，我相信真正的力量來自共好的心。',plain:'贏過別人不是真正的強大，讓大家都變好，才是更長久的力量。',action:'今天遇到競爭情境時，想一個「大家一起贏」的做法。'},
+    {id:38,heart:'awareness',quote:'今天，我為當下做清楚的決定。',plain:'猶豫不決時，先看清楚現在真正的狀況，再做決定，不被情緒牽著走。',action:'有一個一直拖著沒決定的小事，今天就給自己一個答案。'},
+    {id:39,heart:'empathy',quote:'今天，我感受所有的善意。',plain:'別人小小的體貼——一杯水、一句提醒——都值得被你看見和感謝。',action:'今天說出一句「謝謝你」，具體講出對方做了什麼讓你感動的小事。'},
+    {id:40,heart:'accept',quote:'今天，我接納正在學習的自己。',plain:'還不熟練、還會出錯，是「正在學」的證據，不是能力不好的證明。',action:'遇到自己做不好的地方，換句話說：「我正在學這個」，取代「我怎麼這麼笨」。'},
+    {id:41,heart:'presence',quote:'今天，我嘗試創造「心」與「心」的碰觸。',plain:'比起表面的寒暄，今天試著有一次真正走心的交流——聽懂對方，也讓對方感覺被聽懂。',action:'今天找一個人，進行一次不滑手機、專心聽對方說話的對話。'},
+    {id:42,heart:'mutual',quote:'今天，我照亮自己也照亮他人。',plain:'先把自己照顧好，有餘裕時，光才能自然地照到別人身上。',action:'今天先做一件照顧自己的小事，再去照顧別人。'},
+    {id:43,heart:'awareness',quote:'今天，我不被過去的習性牽引。',plain:'舊的反應模式（像是一被質疑就防衛）可以先按暫停，試著換個新的回應方式。',action:'留意一個你常有的舊反應，今天試著用不一樣的方式回應一次。'},
+    {id:44,heart:'empathy',quote:'今天，我看見情緒背後的需求與渴望。',plain:'一個人發脾氣，往往是因為某個需要沒被滿足，不只是「他脾氣不好」而已。',action:'遇到有人情緒大時，問自己「他現在真正需要的是什麼」。'},
+    {id:45,heart:'accept',quote:'今天，我停止自我責備。',plain:'犯錯已經過去了，不需要在腦中重播責怪自己八百次。',action:'發現自己在心裡罵自己時，停下來，換成對朋友說話的語氣重新說一次。'},
+    {id:46,heart:'presence',quote:'今天，我只專注感受當下的力量。',plain:'不去想等一下要做什麼、剛剛做得好不好，單純把注意力放在現在正在做的事上。',action:'今天做一件事時，刻意不去想下一件事，只專注在眼前這件事。'},
+    {id:47,heart:'mutual',quote:'今天，我讓利他與利己取得平衡。',plain:'幫助別人不用犧牲自己到底線以下，兩邊都顧到才是長久之計。',action:'今天答應幫忙之前，先確認這不會讓自己太勉強。'},
+    {id:48,heart:'awareness',quote:'今天，我清醒選擇值得投入的事。',plain:'時間有限，把力氣放在真正重要、對你有意義的事情上，而不是什麼都攬。',action:'今天婉拒一件不那麼重要、會佔用你力氣的事。'},
+    {id:49,heart:'empathy',quote:'今天，我用共情理解回應衝突。',plain:'吵架時先理解對方在意什麼，比急著證明自己有理更能解決問題。',action:'下次意見不合時，先說「我理解你在意的是＿＿」，再說自己的想法。'},
+    {id:50,heart:'accept',quote:'今天，我允許所有的不確定都有它的位置。',plain:'沒有答案、還不確定接下來會怎樣，是可以先被接受的，不用急著找到解答。',action:'把心裡懸著的那件不確定的事，寫下來說「先放著，不用現在解決」。'},
+    {id:51,heart:'presence',quote:'今天，我允許事情自然展開。',plain:'不是每件事都要用力控制或催促，有些事順著它的節奏走，反而會更順。',action:'今天遇到一件急不來的事，決定先放手，讓它照自己的節奏發展。'},
+    {id:52,heart:'mutual',quote:'今天，我珍惜有緣同行的人。',plain:'同事、學生、家人，能一起走這段路本身就值得感謝，不是理所當然。',action:'今天跟一個共事的人說一句「謝謝有你在」。'},
+    {id:53,heart:'awareness',quote:'今天，我選擇對雙方長期有益的方向。',plain:'不只看眼前方便，多想一步：這個決定對彼此的關係長期來說好嗎？',action:'做一個決定前，多問自己一句「這樣做，半年後回頭看還OK嗎」。'},
+    {id:54,heart:'empathy',quote:'今天，我對他人的情緒保持理解與尊重。',plain:'別人的難過或生氣，不需要你去評論「有沒有必要」，尊重那是他當下真實的感受。',action:'今天有人表現出情緒時，不說「不用這樣吧」，只是陪著。'},
+    {id:55,heart:'accept',quote:'今天，我不要求完美。',plain:'手上的工作，做到「可以用」就很好了，不用每個細節都無懈可擊。',action:'今天挑一項工作，完成70分就交出去，不再反覆修。'},
+    {id:56,heart:'presence',quote:'今天，我用五心實踐回歸自性。',plain:'「自性」是指你最真實、最本來的樣子。練習五心，其實是幫你撥開雜念，回到那個本來就很好的自己。',action:'今天安靜1分鐘，問自己「拿掉所有角色和身份，我原本是什麼樣子」。'},
+    {id:57,heart:'mutual',quote:'今天，我讓愛的能量流動。',plain:'收到的善意，可以繼續傳下去給別人，而不是留在原地。',action:'今天把別人曾對你的一個好意，用你的方式傳給另一個人。'},
+    {id:58,heart:'awareness',quote:'今天，我把注意力帶回自己。',plain:'一直盯著別人在做什麼、想什麼，容易忘記照顧自己，把焦點拉回自己身上。',action:'今天發現自己在意別人眼光時，把注意力拉回「我自己現在需要什麼」。'},
+    {id:59,heart:'empathy',quote:'今天，我共情自己的不容易。',plain:'對別人有同理心之外，也記得對自己說：「這陣子真的辛苦你了」。',action:'今天結束前，對自己說一句「今天真的不容易，辛苦了」。'},
+    {id:60,heart:'accept',quote:'今天，我尊重自己的感受。',plain:'不舒服的感覺出現時，先承認「我現在真的不太OK」，不用馬上說服自己沒事。',action:'感覺不對勁時，在心裡誠實說出「我現在的感覺是＿＿」，不急著否認它。'},
+    {id:61,heart:'presence',quote:'今天，我讓身心對齊。',plain:'心裡想的、嘴上說的、身體做的，今天試著讓它們是一致的，不用勉強自己演出跟心裡不一樣的樣子。',action:'今天做一件事之前，先確認這是不是你真心想做的。'},
+    {id:62,heart:'mutual',quote:'今天，我要全然給出、歡喜接受。',plain:'幫忙時不計較，被幫忙時也大方說謝謝，不用不好意思。',action:'今天有人想幫你時，說一句「謝謝，那就麻煩你了」，不推辭。'},
+    {id:63,heart:'awareness',quote:'今天，我暫停一下再回應。',plain:'被戳到情緒的當下，先深呼吸再開口，不要話一出口就後悔。',action:'今天被惹毛的時候，先數3秒再回應，不立刻反駁。'},
+    {id:64,heart:'empathy',quote:'今天，我選擇傾聽多於反駁。',plain:'別人講話時，先把「等一下我要怎麼反駁」的念頭放下，單純聽。',action:'今天一次對話裡，忍住想反駁的衝動，先把對方的話聽完。'},
+    {id:65,heart:'accept',quote:'今天，我允許一切按步調慢慢來。',plain:'有些事急不來，慢慢做、慢慢改變，也是一種前進。',action:'挑一件讓你心急的事，告訴自己「這件事可以分成三天做完」。'},
+    {id:66,heart:'presence',quote:'今天，我在呼吸裡時時覺察。',plain:'呼吸是隨時都在的錨點，忙亂的時候，回到呼吸，就能把自己拉回現場。',action:'今天設一個提醒，每隔一段時間，深呼吸一次，感受當下。'},
+    {id:67,heart:'mutual',quote:'今天，我要學近江商人三方好。',plain:'這是日本「三方良し」的老智慧：做一件事，要對自己好、對對方好、對整個環境／社會也好，三邊都顧到才是真的好決定。',action:'今天做一個決定前，想一想這樣做對「我、對方、大家」是不是都好。'},
+    {id:68,heart:'awareness',quote:'今天，我不被急迫感推著走。',plain:'「好像很急」的感覺，不一定代表真的非現在做不可，先確認一下再行動。',action:'感覺「一定要馬上做」時，先問自己「真的現在非做不可嗎」。'},
+    {id:69,heart:'empathy',quote:'今天，我為彼此保留溫度。',plain:'就算意見不同，也不用把話說絕，留一點餘地讓關係還能繼續。',action:'今天說一句不同意見時，加一句「但我懂你的出發點」。'},
+    {id:70,heart:'accept',quote:'今天，我接住自己的疲憊，允許自己適度休息。',plain:'累的時候先停下來照顧自己，不是撐到最後一刻才休息。',action:'今天提早10分鐘結束手邊工作，留給自己緩衝時間。'},
+    {id:71,heart:'presence',quote:'今天，我陪自己慢慢走，也很好。',plain:'走得比別人慢，或是這陣子狀態比較低，都沒關係，慢慢走也是一種前進。',action:'今天允許自己用比平常慢一點的速度做一件事，不催自己。'},
+    {id:72,heart:'mutual',quote:'今天，我要像稻盛和夫那樣利他。',plain:'稻盛和夫是日本知名企業家，他相信「先為別人著想，事業自然會成功」。今天也試著先想「這樣做對別人好嗎」，而不是只想自己方便。',action:'今天做一件事時，優先考慮對方的方便，而不是自己的方便。'},
+    {id:73,heart:'awareness',quote:'今天，我為意識負責。',plain:'自己的念頭和選擇，自己負責，不推說「我也是不小心的」。',action:'今天做出一個選擇後，坦白承認這是自己選的，不找藉口。'},
+    {id:74,heart:'empathy',quote:'今天，我願意理解不同立場。',plain:'站在對方的位置想一想，即使最後你還是不同意，也能少一點對立。',action:'今天遇到意見不同時，先說出「如果我是他，可能也會這樣想」。'},
+    {id:75,heart:'accept',quote:'今天，我不再與自己對抗，讓自己內耗。',plain:'一邊做事一邊在心裡罵自己，只會更累，先停止內心的自我攻擊。',action:'察覺自己又在心裡跟自己吵架時，深呼吸，說「先停」。'},
+    {id:76,heart:'presence',quote:'今天，我回到自己的心，感受真實的我。',plain:'卸下「老師」、「負責人」這些角色，花一點時間感受最單純的自己。',action:'今天找5分鐘，不扮演任何角色，單純做你自己想做的小事。'},
+    {id:77,heart:'mutual',quote:'今天，無論你是否對我好，我都願意對你好。',plain:'對人好不是為了交換對方也對你好，而是你自己選擇要成為這樣的人。',action:'今天對一個曾經讓你不太舒服的人，依然釋出一個善意。'},
+    {id:78,heart:'awareness',quote:'今天，我看見自己正在做的選擇。',plain:'很多習慣的行為其實都是選擇，只是平常沒意識到自己在選。',action:'今天留意一件你「以為沒得選」的事，其實你是可以選擇的。'},
+    {id:79,heart:'empathy',quote:'今天，我不急著評價他人。',plain:'看到別人的行為，先別急著貼標籤說「這個人怎麼這樣」，多留一點空間了解原因。',action:'今天忍住一次想批評別人的念頭，換成「我還不清楚他的狀況」。'},
+    {id:80,heart:'accept',quote:'今天，我承認有限，也看見可能。',plain:'時間、精力都有限，一個人不可能做完所有事，但還是能挑重要的先做好。',action:'列出今天最重要的一件事，只專心把那一件做好就夠了。'},
+    {id:81,heart:'presence',quote:'今天，我學習與自己同在。',plain:'獨處的時候，試著不逃避、不滑手機分心，單純陪自己待一下。',action:'今天給自己5分鐘獨處時間，不看手機，單純跟自己在一起。'},
+    {id:82,heart:'mutual',quote:'今天，我讓能量交換與流動。',plain:'給予和接收都是關係的一部分，不用一直單方面付出，也可以讓別人有機會回饋你。',action:'今天讓一個平常都是你在照顧的人，也有機會照顧你一下。'},
+    {id:83,heart:'awareness',quote:'今天，我選擇清醒，而非投射。',plain:'對別人的不滿，有時其實是自己心裡的擔心跑出來，先分清楚是誰的情緒。',action:'對某人感到不滿時，問自己「這是他的問題，還是我自己在擔心什麼」。'},
+    {id:84,heart:'empathy',quote:'今天，我用共情取代責怪。',plain:'事情出錯時，先理解發生了什麼，而不是急著找人負責、指責。',action:'今天遇到疏失時，先問「發生了什麼事」，不先問「是誰的錯」。'},
+    {id:85,heart:'accept',quote:'今天，我對自己溫柔，而不是苛責。',plain:'對學生、對家人都很有耐心，也記得同樣的溫柔，留一點給自己。',action:'今天對自己說一句你平常會對別人說的鼓勵的話。'},
+    {id:86,heart:'presence',quote:'今天，我學習讓全體獲益。',plain:'做決定時，想一下這個選擇對整個班級、整個團隊是不是也有幫助，不只是對自己方便。',action:'今天安排一件事時，想一想這樣做對整體（班級/團隊）是否也好。'},
+    {id:87,heart:'mutual',quote:'今天，我選擇以合作取代競爭。',plain:'遇到可以競爭也可以合作的情況，先試試看「一起做」會不會結果更好。',action:'今天有比較的情境時，主動提出一個合作而非比較的做法。'},
+    {id:88,heart:'awareness',quote:'今天，我回到呼吸與當下。',plain:'心思飄走、腦子很亂的時候，回到呼吸，是最快把自己拉回現場的方法。',action:'感覺心很亂時，深呼吸三次，感受空氣進出身體。'},
+    {id:89,heart:'empathy',quote:'今天，我對自己的辛苦表達理解。',plain:'忙到分身乏術的時候，記得跟自己說一聲：「這真的很累，你做得已經很好了」。',action:'今天忙碌告一段落時，具體說出自己今天完成的一件事，肯定自己。'},
+    {id:90,heart:'accept',quote:'今天，我不否定情緒，只是陪伴它。',plain:'生氣、難過、煩躁出現時，不用馬上壓下去或說服自己「不該這樣」，先陪它一下就好。',action:'情緒出現時，在心裡對它說：「我知道你在，我陪你一下。」'},
+    {id:91,heart:'presence',quote:'今天，我放下掌控，信任一切。',plain:'不是每件事都要你緊緊抓著才會沒事，有時候放手、相信，事情也會有它的安排。',action:'今天挑一件你一直很想插手控制的事，練習先放手一天。'},
+    {id:92,heart:'mutual',quote:'今天，我站在對方的利益思考。',plain:'做決定前先想「這對他來說是不是也划算、也舒服」，不是只考慮自己方便。',action:'今天安排一件事之前，先站在對方角度想一次。'},
+    {id:93,heart:'awareness',quote:'今天，我不讓情緒自動駕駛。',plain:'生氣時說出口的話，往往不是真心話，先讓情緒緩一緩，再決定怎麼說。',action:'今天生氣的當下，先離開現場或沉默10秒，再開口。'},
+    {id:94,heart:'empathy',quote:'今天，我願意聽見內在的聲音。',plain:'心裡那個小小的不安或猶豫，值得被聽見，不用急著壓下去或忽略它。',action:'今天靜下來1分鐘，問自己「我現在心裡真正的感覺是什麼」。'},
+    {id:95,heart:'accept',quote:'今天，我允許自己的狀態如實存在。',plain:'今天狀態不好就是不好，不用勉強演出「很OK」的樣子。',action:'如果今天狀態不好，允許自己用比平常慢一點的步調做事。'},
+    {id:96,heart:'presence',quote:'今天，我溫柔陪自己走完一天。',plain:'不管今天過得順不順，用溫柔而不是苛責的方式，陪自己走到今天結束。',action:'睡前對自己說一句：「今天辛苦了，做得很好。」'},
+    {id:97,heart:'mutual',quote:'今天，我的選擇也為他人留路。',plain:'做決定時，順便想一下這個決定會不會擋到別人的路，盡量留一點空間給別人。',action:'今天做一個安排時，特別留一個選項讓別人也能參與。'},
+    {id:98,heart:'awareness',quote:'今天，我覺察慣性，重新選擇。',plain:'發現自己又用老方法做出讓自己後悔的反應時，可以停下來選一個新的做法。',action:'找出一個你常後悔的反應模式，今天故意換個新方式試試看。'},
+    {id:99,heart:'empathy',quote:'今天，我試著共情自己正在承受什麼。',plain:'先搞清楚自己現在扛著什麼壓力，才有辦法真的照顧好自己。',action:'寫下一句話，具體說出你今天正在承受的一件事。'},
+    {id:100,heart:'accept',quote:'今天，我接納此刻的自己，不急著變好。',plain:'改變需要時間，此刻的你已經夠好，不用馬上變成更好的版本。',action:'今天不訂「變更好」的目標，只單純把今天過完就好。'}
+  ];
+
+  var POCKET = [
+    {heart:'awareness', text:'先暫停3秒：這個決定，是我真正想要的，還是只是想趕快擺脫不舒服的感覺？'},
+    {heart:'awareness', text:'問自己：如果半年後回頭看，這個決定我還會覺得OK嗎？'},
+    {heart:'awareness', text:'「好像很急」不代表真的要馬上決定。可以問自己：這件事真的不能等到明天嗎？'},
+    {heart:'awareness', text:'問自己：這是理性的判斷，還是舊有的習慣反應（像是自動討好或自動逃避）？'},
+    {heart:'mutual', text:'想一下「三方好」：這樣做，對我好、對他好、對整體也好嗎？'},
+    {heart:'mutual', text:'站在對方的立場想一次：如果我是他，會怎麼看這件事？'},
+    {heart:'mutual', text:'這個決定會不會擋到別人的路？有沒有辦法也留一點空間給別人？'},
+    {heart:'mutual', text:'用利他的角度想一次：這樣做，長期來說對彼此的關係好嗎？'},
+    {heart:'accept', text:'不確定也沒關係，允許自己說「我現在還沒有答案」，不用馬上想清楚。'},
+    {heart:'accept', text:'先不要求做出「完美」的決定，只要做出「現在夠好」的決定就可以。'},
+    {heart:'accept', text:'允許自己說：不管怎麼選，都不會是唯一或最後的機會。'},
+    {heart:'empathy', text:'這個猶豫，是因為在意某個人的感受嗎？先在心裡說出來：我在意的是＿＿。'},
+    {heart:'empathy', text:'傾聽自己內在的聲音：拋開別人的期待，我自己真正的感覺是什麼？'},
+    {heart:'presence', text:'深呼吸一次，把注意力帶回身體，感受一下此刻的自己在想什麼。'},
+    {heart:'presence', text:'放下一定要馬上控制結果的念頭，試著相信：先做一步，路會慢慢清楚。'}
+  ];
+
+  // ---------- state ----------
+  var state = { mode:'daily', filter:null };
+  var LS_KEY = 'todayFiveHearts_v1';
+
+  function safeGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function safeSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+  }
+
+  // ---------- streak (連續使用天數，溫柔不苛責) ----------
+  var STREAK_KEY = 'fiveHeartsStreak_v1';
+  function pad2(n){ return (n<10?'0':'')+n; }
+  function localDateStr(d){
+    d = d || new Date();
+    return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
+  }
+  function daysBetweenLocal(a,b){
+    var pa=a.split('-').map(Number), pb=b.split('-').map(Number);
+    var da=new Date(pa[0],pa[1]-1,pa[2]), db=new Date(pb[0],pb[1]-1,pb[2]);
+    return Math.round((db-da)/86400000);
+  }
+  function streakLabel(n){
+    if(n>=100) return '百日心燈';
+    if(n>=21) return '穩定紮根';
+    if(n>=7) return '小小習慣';
+    if(n>=1) return '初心萌芽';
+    return '';
+  }
+  function streakIcon(n){
+    if(n>=100) return '🕊️';
+    if(n>=21) return '🌳';
+    if(n>=7) return '🌿';
+    return '🌱';
+  }
+  function updateStreak(){
+    var today = localDateStr();
+    var raw = safeGet(STREAK_KEY);
+    var data = {lastDate:null, streak:0, longest:0};
+    if (raw){ try{ var parsed = JSON.parse(raw); if(parsed) data = parsed; }catch(e){} }
+    var msg = null;
+    if (!data.lastDate){
+      data.streak = 1;
+      msg = {type:'welcome', text:'今天是你第一天練習五心，很高興你來了。'};
+    } else if (data.lastDate === today){
+      // 今天已經記錄過，不重複觸發訊息
+    } else {
+      var gap = daysBetweenLocal(data.lastDate, today);
+      if (gap === 1){
+        data.streak = (data.streak||0) + 1;
+        if (data.streak===7 || data.streak===21 || data.streak===100){
+          msg = {type:'milestone', text:'連續練習第 '+data.streak+' 天了——'+streakLabel(data.streak)+' '+streakIcon(data.streak)};
+        }
+      } else if (gap > 1){
+        data.streak = 1;
+        msg = {type:'comeback', text:'好久不見，很高興你今天回來了。今天重新開始，也是一種接納。'};
+      }
+    }
+    data.lastDate = today;
+    if (data.streak > (data.longest||0)) data.longest = data.streak;
+    safeSet(STREAK_KEY, JSON.stringify(data));
+    return {streak:data.streak, longest:data.longest, message:msg};
+  }
+  function renderStreak(){
+    var result = updateStreak();
+    var row = document.getElementById('streakRow');
+    if (row){
+      var label = streakLabel(result.streak);
+      row.innerHTML = '<span class="streak-badge"><span class="flame">'+streakIcon(result.streak)+'</span>連續 '+result.streak+' 天'+(label?'・'+label:'')+'</span>';
+    }
+    var banner = document.getElementById('streakBanner');
+    if (banner && result.message){
+      banner.innerHTML = result.message.text + '<button type="button" id="streakBannerClose" aria-label="關閉">×</button>';
+      banner.hidden = false;
+      var closeBtn = document.getElementById('streakBannerClose');
+      if (closeBtn) closeBtn.addEventListener('click', function(){ banner.hidden = true; });
+    }
+  }
+
+  // ---------- today's official card (manual draw) ----------
+  var TODAY_CARD_KEY = 'fiveHeartsTodayCard_v1';
+  function getTodayCard(){
+    var raw = safeGet(TODAY_CARD_KEY);
+    if (!raw) return null;
+    try{
+      var obj = JSON.parse(raw);
+      if (obj.date !== todayStr()) return null;
+      var c = CARDS.filter(function(x){ return x.id===obj.cardId; })[0];
+      return c || null;
+    }catch(e){ return null; }
+  }
+  function setTodayCard(card){
+    safeSet(TODAY_CARD_KEY, JSON.stringify({date: todayStr(), cardId: card.id}));
+  }
+
+  function seededIndex(seedStr, poolLen){
+    var h = 0;
+    for (var i=0;i<seedStr.length;i++){ h = (h*31 + seedStr.charCodeAt(i)) >>> 0; }
+    return h % poolLen;
+  }
+
+  function pool(){
+    if (state.filter) return CARDS.filter(function(c){ return c.heart===state.filter; });
+    return CARDS;
+  }
+
+  function loadTodayLog(){
+    var raw = safeGet(LS_KEY);
+    if (!raw) return {date: todayStr(), ids:[]};
+    try{
+      var obj = JSON.parse(raw);
+      if (obj.date !== todayStr()) return {date: todayStr(), ids:[]};
+      return obj;
+    }catch(e){ return {date: todayStr(), ids:[]}; }
+  }
+  function pushTodayLog(id){
+    var log = loadTodayLog();
+    if (log.ids.indexOf(id) === -1) log.ids.push(id);
+    safeSet(LS_KEY, JSON.stringify(log));
+    renderHistory(log);
+  }
+
+  // ---------- render: chips ----------
+  var chipsEl = document.getElementById('chips');
+  function renderChips(){
+    chipsEl.innerHTML = '';
+    HEART_KEYS.slice().sort(function(a,b){return HEARTS[a].order-HEARTS[b].order;}).forEach(function(key){
+      var b = document.createElement('button');
+      b.type='button'; b.className='chip'; b.style.setProperty('--c','var(--'+key+')');
+      b.setAttribute('aria-pressed', state.filter===key ? 'true':'false');
+      b.innerHTML = '<span class="dot"></span>'+HEARTS[key].name;
+      b.addEventListener('click', function(){
+        state.filter = (state.filter===key) ? null : key;
+        renderChips();
+        renderStage();
+      });
+      chipsEl.appendChild(b);
+    });
+  }
+
+  // ---------- render: card ----------
+  function cardHTML(card, roleLabel, small){
+    var h = HEARTS[card.heart];
+    return (
+      '<div class="card" style="--c:var(--'+card.heart+');--cs:var(--'+card.heart+'-soft)">' +
+        '<div class="band">' +
+          (roleLabel ? '<span class="role">'+roleLabel+'</span>' : '<span></span>') +
+          '<span class="heart-tag">'+ICONS[card.heart]+h.name+'</span>' +
+        '</div>' +
+        '<div class="scene">'+SCENES[card.heart]+'</div>' +
+        '<p class="quote">'+card.quote+'</p>' +
+        '<hr class="divider">' +
+        '<p class="plain">'+card.plain+'</p>' +
+        '<div class="action"><b>今日行動</b><span>'+card.action+'</span></div>' +
+      '</div>'
+    );
+  }
+
+  var stageEl = document.getElementById('stage');
+  var actionsEl = document.getElementById('actionsRow');
+  var noteEl = document.getElementById('todayNote');
+  var tripleDrawn = null; // in-memory only, resets on reload
+
+  function emptyCardHTML(title, sub, btnId, btnLabel){
+    return (
+      '<div class="card card-empty" style="--c:var(--presence);--cs:var(--presence-soft)">' +
+        '<div class="empty-inner">' + ICONS.blank +
+          '<p class="empty-title">'+title+'</p>' +
+          '<p class="empty-sub">'+sub+'</p>' +
+          '<button type="button" class="btn primary" id="'+btnId+'">'+btnLabel+'</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderActionsDaily(hasCard){
+    actionsEl.innerHTML = '';
+    if (!hasCard) return; // the draw CTA lives inside the empty card itself
+    var b1 = document.createElement('button');
+    b1.className='btn'; b1.textContent='換一張（多抽練習）';
+    b1.addEventListener('click', drawExtra);
+    var b2 = document.createElement('button');
+    b2.className='btn primary'; b2.textContent='回到今日卡';
+    b2.addEventListener('click', backToTodayCard);
+    actionsEl.appendChild(b1); actionsEl.appendChild(b2);
+  }
+
+  function renderActionsTriple(hasDrawn){
+    actionsEl.innerHTML = '';
+    if (!hasDrawn) return;
+    var b3 = document.createElement('button');
+    b3.className='btn primary'; b3.textContent='再抽一組';
+    b3.addEventListener('click', drawTripleNow);
+    actionsEl.appendChild(b3);
+  }
+
+  function renderHistory(log){
+    var histEl = document.getElementById('history');
+    histEl.innerHTML='';
+    log.ids.forEach(function(id){
+      var c = CARDS.filter(function(x){return x.id===id;})[0];
+      if (!c) return;
+      var s = document.createElement('span');
+      s.className='on'; s.style.setProperty('--dc','var(--'+c.heart+')');
+      s.title = c.quote;
+      histEl.appendChild(s);
+    });
+  }
+
+  function renderStage(){
+    stageEl.className = 'stage';
+    if (state.mode === 'daily'){
+      var tc = getTodayCard();
+      if (!tc){
+        stageEl.classList.add('stage-single');
+        stageEl.innerHTML = emptyCardHTML('今天的卡還沒抽', '準備好了，就抽一張今天的提醒', 'drawTodayBtn', '抽今日卡');
+        document.getElementById('drawTodayBtn').addEventListener('click', drawTodayOfficial);
+        noteEl.textContent = '';
+      } else {
+        stageEl.classList.add('stage-single');
+        stageEl.innerHTML = cardHTML(tc, null, false);
+        noteEl.textContent = '今天的日期卡（'+todayStr().replace(/-/g,'/')+'）· 想再練習可以「換一張」';
+      }
+      renderActionsDaily(!!tc);
+    } else {
+      if (!tripleDrawn){
+        stageEl.classList.add('stage-single');
+        stageEl.innerHTML = emptyCardHTML('過去・現在・未來', '抽三張卡，回顧、看見此刻、給自己一個方向', 'drawTripleBtn', '抽三張卡');
+        document.getElementById('drawTripleBtn').addEventListener('click', drawTripleNow);
+        noteEl.textContent = '';
+      } else {
+        stageEl.classList.add('stage-triple');
+        var labels = ['過去','現在','未來'];
+        stageEl.innerHTML = tripleDrawn.map(function(c,i){ return cardHTML(c, labels[i], true); }).join('');
+        noteEl.textContent = '過去／現在／未來三張法：回顧、看見此刻、給自己一個方向';
+      }
+      renderActionsTriple(!!tripleDrawn);
+    }
+  }
+
+  function drawTodayOfficial(){
+    var p = pool();
+    var card = p[Math.floor(Math.random()*p.length)];
+    setTodayCard(card);
+    pushTodayLog(card.id);
+    renderStage();
+  }
+
+  function drawExtra(){
+    var p = pool();
+    var card = p[Math.floor(Math.random()*p.length)];
+    stageEl.className = 'stage stage-single';
+    stageEl.innerHTML = cardHTML(card, null, false);
+    noteEl.textContent = '這是額外抽的一張，不影響今天的日期卡';
+    pushTodayLog(card.id);
+  }
+
+  function backToTodayCard(){
+    var tc = getTodayCard();
+    if (!tc) return;
+    stageEl.className = 'stage stage-single';
+    stageEl.innerHTML = cardHTML(tc, null, false);
+    noteEl.textContent = '今天的日期卡（'+todayStr().replace(/-/g,'/')+'）· 想再練習可以「換一張」';
+  }
+
+  function drawTripleNow(){
+    var p2 = pool();
+    var picks = [];
+    var tries = 0;
+    while (picks.length < 3 && tries < 200){
+      var c = p2[Math.floor(Math.random()*p2.length)];
+      if (picks.indexOf(c) === -1) picks.push(c);
+      tries++;
+    }
+    tripleDrawn = picks;
+    picks.forEach(function(c){ pushTodayLog(c.id); });
+    renderStage();
+  }
+
+  document.getElementById('modeDaily').addEventListener('click', function(){
+    state.mode='daily';
+    this.setAttribute('aria-pressed','true');
+    document.getElementById('modeTriple').setAttribute('aria-pressed','false');
+    renderStage();
+  });
+  document.getElementById('modeTriple').addEventListener('click', function(){
+    state.mode='triple';
+    this.setAttribute('aria-pressed','true');
+    document.getElementById('modeDaily').setAttribute('aria-pressed','false');
+    renderStage();
+  });
+
+  // ---------- guide panel ----------
+  var guideList = document.getElementById('guideList');
+  HEART_KEYS.slice().sort(function(a,b){return HEARTS[a].order-HEARTS[b].order;}).forEach(function(key){
+    var h = HEARTS[key];
+    var row = document.createElement('div');
+    row.className='heart-row';
+    row.style.setProperty('--h','var(--'+key+')');
+    row.style.setProperty('--hs','var(--'+key+'-soft)');
+    row.innerHTML = '<div class="icon">'+ICONS[key]+'</div><div><p class="name">'+h.order+'　'+h.name+'</p><p>'+h.tagline+'</p></div>';
+    guideList.appendChild(row);
+  });
+  var overlay = document.getElementById('guideOverlay');
+  document.getElementById('openGuide').addEventListener('click', function(){ overlay.classList.add('open'); });
+  document.getElementById('closeGuide').addEventListener('click', function(){ overlay.classList.remove('open'); });
+  overlay.addEventListener('click', function(e){ if (e.target===overlay) overlay.classList.remove('open'); });
+
+  // ---------- pocket wisdom (猶豫錦囊) ----------
+  var pocketOverlay = document.getElementById('pocketOverlay');
+  var pocketCardEl = document.getElementById('pocketCard');
+  function renderPocketCard(){
+    var item = POCKET[Math.floor(Math.random()*POCKET.length)];
+    var h = HEARTS[item.heart];
+    pocketCardEl.innerHTML =
+      '<div class="pocket-item" style="--c:var(--'+item.heart+');--cs:var(--'+item.heart+'-soft)">' +
+        '<p class="pocket-tag">'+ICONS[item.heart]+h.name+'</p>' +
+        '<div class="scene">'+SCENES[item.heart]+'</div>' +
+        '<p class="pocket-text">'+item.text+'</p>' +
+      '</div>';
+  }
+  document.getElementById('openPocket').addEventListener('click', function(){
+    renderPocketCard();
+    pocketOverlay.classList.add('open');
+  });
+  document.getElementById('pocketAgain').addEventListener('click', renderPocketCard);
+  document.getElementById('closePocket').addEventListener('click', function(){ pocketOverlay.classList.remove('open'); });
+  pocketOverlay.addEventListener('click', function(e){ if (e.target===pocketOverlay) pocketOverlay.classList.remove('open'); });
+
+  // ---------- init ----------
+  renderChips();
+  renderHistory(loadTodayLog());
+  renderStage();
+  renderStreak();
+
+  // ---------- PWA: register service worker (for installable app / offline) ----------
+  if ('serviceWorker' in navigator){
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('service-worker.js').catch(function(){});
+    });
+  }
+})();
+</script>
+</body>
+</html>
